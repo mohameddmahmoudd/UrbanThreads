@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/Button';
+import { toMediaUrl } from '@/lib/media';
 
 export default function CartPage() {
   const { cart, isLoading, updateItem, removeItem } = useCart();
@@ -40,7 +41,7 @@ export default function CartPage() {
               <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
                 {item.product.imageUrl ? (
                   <img
-                    src={item.product.imageUrl}
+                    src={toMediaUrl(item.product.imageUrl)}
                     alt={item.product.name}
                     className="h-full w-full object-cover"
                   />

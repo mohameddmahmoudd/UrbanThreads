@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Product } from '@/types/api.types';
+import { toMediaUrl } from '@/lib/media';
 
 export function ProductCard({ product }: { product: Product }) {
   const price = product.variants.length > 0
@@ -14,7 +15,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-100">
         {product.imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={toMediaUrl(product.imageUrl)}
             alt={product.name}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />

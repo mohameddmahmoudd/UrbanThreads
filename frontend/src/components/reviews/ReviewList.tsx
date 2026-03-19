@@ -1,4 +1,5 @@
 import type { Review } from '@/types/api.types';
+import { toMediaUrl } from '@/lib/media';
 
 export function ReviewList({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) {
@@ -35,7 +36,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
           )}
           {review.imageUrl && (
             <img
-              src={review.imageUrl}
+              src={toMediaUrl(review.imageUrl)}
               alt="Review"
               className="mt-2 h-32 w-32 rounded-md object-cover"
             />

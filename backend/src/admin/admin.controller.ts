@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import { OrderStatus } from '@prisma/client';
 import { AdminService } from './admin.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -60,7 +61,7 @@ export class AdminController {
   }
 
   @Post('products/:id/images')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async uploadProductImage(
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,

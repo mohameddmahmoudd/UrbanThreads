@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { AddToCartButton } from '@/components/products/AddToCartButton';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { toMediaUrl } from '@/lib/media';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -29,7 +30,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
         {product.imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={toMediaUrl(product.imageUrl)}
             alt={product.name}
             className="h-full w-full object-cover"
           />

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { productSchema, ProductInput } from '@/lib/validations';
 import { api, ApiError } from '@/lib/api';
+import { toMediaUrl } from '@/lib/media';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import type { Category } from '@/types/api.types';
@@ -22,6 +23,11 @@ export default function EditProductPage({ params }: Props) {
   const [loading, setLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [imageSuccess, setImageSuccess] = useState('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState('');
+
   const {
     register,
     handleSubmit,
@@ -37,6 +43,7 @@ export default function EditProductPage({ params }: Props) {
       api.get<Category[]>('/categories'),
     ]).then(([product, cats]) => {
       setCategories(cats);
+      setCurrentImageUrl(product.imageUrl ? toMediaUrl(product.imageUrl) : null);
       reset({
         name: product.name,
         description: product.description || '',
@@ -59,10 +66,28 @@ export default function EditProductPage({ params }: Props) {
 
   const handleImageUpload = async () => {
     const file = fileRef.current?.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('image', file);
-    await api.upload(`/admin/products/${id}/images`, formData);
+    if (!file) {
+      setError('Please choose an image first.');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setImageSuccess('');
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const updated = await api.upload<{ imageUrl: string }>(`/admin/products/${id}/images`, formData);
+      setCurrentImageUrl(toMediaUrl(updated.imageUrl));
+      setImageSuccess('Image uploaded successfully');
+      if (fileRef.current) fileRef.current.value = '';
+      setSelectedFileName('');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Image upload failed');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   if (loading) return <p className="text-gray-500">Loading...</p>;
@@ -124,15 +149,54 @@ export default function EditProductPage({ params }: Props) {
       {/* Image upload */}
       <div className="mt-6 rounded-md border p-4">
         <h3 className="mb-2 text-sm font-semibold">Product Image</h3>
-        <input ref={fileRef} type="file" accept="image/*" className="text-sm" />
+        {currentImageUrl && (
+          <img
+            src={currentImageUrl}
+            alt="Current product image"
+            className="mb-3 h-40 w-40 rounded-md object-cover"
+          />
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setSelectedFileName(file?.name || '');
+            setImageSuccess('');
+            setError('');
+          }}
+        />
         <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={() => fileRef.current?.click()}
+        >
+          Choose Image
+        </Button>
+        {selectedFileName && (
+          <p className="mt-2 text-xs text-gray-500">Selected: {selectedFileName}</p>
+        )}
+        <Button
+          type="button"
           onClick={handleImageUpload}
           size="sm"
           variant="secondary"
           className="mt-2"
+          loading={isUploadingImage}
         >
           Upload Image
         </Button>
+        {!selectedFileName && (
+          <p className="mt-2 text-xs text-gray-500">
+            Choose an image file, then click Upload Image.
+          </p>
+        )}
+        {imageSuccess && (
+          <p className="mt-2 text-sm text-green-600">{imageSuccess}</p>
+        )}
       </div>
     </div>
   );
