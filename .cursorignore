@@ -1,0 +1,28 @@
+# build output
+dist
+build
+coverage
+.next
+out
+target
+
+# deps / generated
+node_modules
+.generated
+tmp
+logs
+
+# secrets / local config
+.env
+.env.*
+secrets/*
+*.pem
+*.key
+
+# # large artifacts
+# *.png
+# *.jpg
+# *.jpeg
+# *.pdf
+# *.zip
+# *.mp4

@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+# Engineering Rules
+
+You must follow these rules when generating or modifying code:
+
+1. Prefer simple solutions.
+2. Do not duplicate code. Check for existing utilities, helpers, services, components, or patterns before adding new logic.
+3. Only change what was requested, plus changes that are clearly necessary for correctness and directly related.
+4. For bug fixes, stay within the current implementation and existing patterns first.
+5. Do not introduce new frameworks, patterns, or technologies unless the current approach has been reasonably exhausted.
+6. If you replace an old implementation with a new one, remove the old logic so only one source of truth remains.
+7. Keep the codebase clean, organized, and consistent with existing structure.
+8. Avoid adding one-off scripts or throwaway files unless there is no cleaner option.
+9. Keep files focused. Refactor when a file exceeds roughly 200–300 lines.
+10. Use standard architectural patterns and design patterns only when they clearly improve clarity or maintainability.
+11. Never overwrite or modify .env files without explicit confirmation.

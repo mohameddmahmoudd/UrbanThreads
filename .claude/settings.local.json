@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:developer.gameball.co)",
+      "WebFetch(domain:docs.gameball.co)",
+      "WebSearch"
+    ]
+  }
+}

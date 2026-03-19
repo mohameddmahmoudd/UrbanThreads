@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.next
+out
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+coverage
+.DS_Store
+uploads/
