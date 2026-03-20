@@ -122,4 +122,9 @@ export class UsersService {
   async getLoyalty(userId: string) {
     return this.gameball.getCustomerLoyalty(userId);
   }
+
+  async getWidgetToken(userId: string) {
+    const token = await this.gameball.getWidgetToken(userId);
+    return { token };
+  }
 }

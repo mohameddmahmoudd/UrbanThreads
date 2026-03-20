@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
+import { SignJWT, CompactEncrypt } from 'jose';
 
 interface LineItem {
   productId: string;
@@ -28,6 +29,32 @@ export class GameballService {
       },
       timeout: 10000,
     });
+  }
+
+  async createOrUpdateCustomer(
+    customerId: string,
+    attrs: {
+      email?: string;
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+    },
+  ): Promise<void> {
+    await this.retryCall(() =>
+      this.client.post('/customers', {
+        customerId,
+        email: attrs.email,
+        customerAttributes: {
+          firstName: attrs.firstName,
+          lastName: attrs.lastName,
+          email: attrs.email,
+          mobile: attrs.phone,
+          channel: 'web',
+          joinDate: new Date().toISOString(),
+        },
+      }),
+    );
+    this.logger.log(`Customer ${customerId} created/updated in Gameball`);
   }
 
   async sendProfileCompletedEvent(customerId: string): Promise<void> {
@@ -121,6 +148,21 @@ export class GameballService {
       }),
     );
     this.logger.log(`Points redeemed for customer ${customerId}`);
+  }
+
+  async getWidgetToken(userId: string): Promise<string> {
+    const keyBytes = new TextEncoder().encode(this.secretKey);
+    const exp = Math.floor(Date.now() / 1000) + 2 * 60 * 60; // 2 hours
+
+    const jws = await new SignJWT({ customerId: userId, exp })
+      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+      .sign(keyBytes);
+
+    const jwe = await new CompactEncrypt(new TextEncoder().encode(jws))
+      .setProtectedHeader({ alg: 'A256KW', enc: 'A256CBC-HS512' })
+      .encrypt(keyBytes);
+
+    return jwe;
   }
 
   async getCustomerLoyalty(customerId: string) {

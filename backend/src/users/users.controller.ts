@@ -68,4 +68,9 @@ export class UsersController {
   getLoyalty(@CurrentUser('id') userId: string) {
     return this.usersService.getLoyalty(userId);
   }
+
+  @Get('me/widget-token')
+  getWidgetToken(@CurrentUser('id') userId: string) {
+    return this.usersService.getWidgetToken(userId);
+  }
 }
