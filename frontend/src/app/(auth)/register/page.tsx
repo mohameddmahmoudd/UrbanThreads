@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterInput) => {
     setError('');
     try {
-      await registerUser(data.email, data.password);
+      await registerUser(data.email, data.password, data.firstName, data.lastName);
       router.push('/');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Registration failed');
@@ -45,6 +45,20 @@ export default function RegisterPage() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            id="firstName"
+            label="First Name"
+            error={errors.firstName?.message}
+            {...register('firstName')}
+          />
+          <Input
+            id="lastName"
+            label="Last Name"
+            error={errors.lastName?.message}
+            {...register('lastName')}
+          />
+        </div>
         <Input
           id="email"
           label="Email"

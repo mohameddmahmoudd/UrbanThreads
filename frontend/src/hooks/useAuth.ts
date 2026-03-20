@@ -11,13 +11,26 @@ export function useAuth() {
 
   const login = async (email: string, password: string) => {
     const res = await api.post<AuthResponse>('/auth/login', { email, password });
-    setUser(res.user as User);
+    // Fetch full profile so the store has firstName, lastName, etc.
+    const profile = await api.get<User>('/users/me');
+    setUser(profile);
     return res;
   };
 
-  const register = async (email: string, password: string) => {
-    const res = await api.post<AuthResponse>('/auth/register', { email, password });
-    setUser(res.user as User);
+  const register = async (
+    email: string,
+    password: string,
+    firstName?: string,
+    lastName?: string,
+  ) => {
+    const res = await api.post<AuthResponse>('/auth/register', {
+      email,
+      password,
+      firstName,
+      lastName,
+    });
+    const profile = await api.get<User>('/users/me');
+    setUser(profile);
     return res;
   };
 
