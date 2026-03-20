@@ -186,9 +186,14 @@ export class GameballService {
       this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error: any) {
-      this.logger.warn(
-        `Failed to fetch loyalty for ${customerId}: ${error.message}`,
-      );
+      const status = error?.response?.status;
+      if (status === 404) {
+        this.logger.debug(`Customer ${customerId} not yet in Gameball (404)`);
+      } else {
+        this.logger.warn(
+          `Failed to fetch loyalty for ${customerId}: ${error.message}`,
+        );
+      }
       return {
         pointsBalance: null,
         tier: null,
