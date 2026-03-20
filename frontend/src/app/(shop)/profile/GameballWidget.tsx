@@ -9,6 +9,8 @@ interface Props {
 
 export default function GameballWidget({ userId }: Props) {
   useEffect(() => {
+    if (document.getElementById('gameball-script')) return;
+
     let script: HTMLScriptElement | null = null;
 
     api
@@ -25,6 +27,7 @@ export default function GameballWidget({ userId }: Props) {
         };
 
         script = document.createElement('script');
+        script.id = 'gameball-script';
         script.src = 'https://assets.gameball.co/widget/js/gameball-init.min.js';
         script.defer = true;
         document.body.appendChild(script);
@@ -34,7 +37,15 @@ export default function GameballWidget({ userId }: Props) {
       );
 
     return () => {
-      if (script) document.body.removeChild(script);
+      const existing = document.getElementById('gameball-script');
+      if (existing) document.body.removeChild(existing);
+
+      document
+        .querySelectorAll('[id*="gameball"], [class*="gameball"]')
+        .forEach((el) => el.remove());
+
+      delete (window as any).GbSdk;
+      delete (window as any).GbLoadInit;
     };
   }, [userId]);
 
