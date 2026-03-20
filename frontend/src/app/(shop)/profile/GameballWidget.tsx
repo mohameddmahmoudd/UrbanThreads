@@ -41,7 +41,14 @@ export default function GameballWidget({ userId }: Props) {
       if (existing) document.body.removeChild(existing);
 
       document
-        .querySelectorAll('[id*="gameball"], [class*="gameball"]')
+        .querySelectorAll(
+          '[id*="gameball" i], [class*="gameball" i], [id*="gb-" i], [class*="gb-" i], [id*="gb_" i], [class*="gb_" i]',
+        )
+        .forEach((el) => el.remove());
+
+      // Remove any iframes injected by the widget
+      document
+        .querySelectorAll('iframe[src*="gameball"]')
         .forEach((el) => el.remove());
 
       delete (window as any).GbSdk;
