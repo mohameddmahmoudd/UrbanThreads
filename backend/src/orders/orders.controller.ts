@@ -26,6 +26,14 @@ export class OrdersController {
     return this.ordersService.createPaymentIntent(userId, dto);
   }
 
+  @Post('confirm')
+  confirmPayment(
+    @CurrentUser('id') userId: string,
+    @Body('paymentIntentId') paymentIntentId: string,
+  ) {
+    return this.ordersService.confirmPayment(userId, paymentIntentId);
+  }
+
   @Get()
   findAll(
     @CurrentUser('id') userId: string,

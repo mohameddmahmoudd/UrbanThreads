@@ -41,7 +41,7 @@ function CheckoutForm({
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/orders`,
+        return_url: `${window.location.origin}/checkout/success`,
       },
     });
 
@@ -125,7 +125,11 @@ export default function CheckoutPage() {
         <h2 className="mb-3 text-lg font-semibold">Delivery Address</h2>
         {addresses.length === 0 ? (
           <p className="text-sm text-gray-500">
-            No addresses saved. Please add one in your profile first.
+            No addresses saved.{' '}
+            <a href="/profile" className="font-medium text-black underline">
+              Add one in your profile
+            </a>{' '}
+            before continuing.
           </p>
         ) : (
           <div className="space-y-2">

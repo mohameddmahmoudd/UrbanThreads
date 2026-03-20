@@ -212,6 +212,25 @@ export class OrdersService {
     return order;
   }
 
+  /**
+   * Sync fallback: frontend calls this after Stripe redirect.
+   * Retrieves the PaymentIntent from Stripe, verifies ownership, and
+   * runs handlePaymentSuccess (idempotent — safe if webhook already fired).
+   */
+  async confirmPayment(userId: string, paymentIntentId: string) {
+    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.metadata.userId !== userId) {
+      throw new BadRequestException('Payment does not belong to this user');
+    }
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new BadRequestException('Payment has not succeeded');
+    }
+
+    return this.handlePaymentSuccess(paymentIntent);
+  }
+
   async findUserOrders(userId: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
