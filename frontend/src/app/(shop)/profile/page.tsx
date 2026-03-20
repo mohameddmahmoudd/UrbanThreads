@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import type { Address, LoyaltyProfile } from '@/types/api.types';
-import GameballWidget from './GameballWidget';
 
 export default function ProfilePage() {
   const { user, fetchProfile } = useAuth();
@@ -79,8 +78,6 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
-    <GameballWidget userId={user.id} />
     <div className="grid gap-8 lg:grid-cols-2">
       {/* Left: Profile + Addresses */}
       <div className="space-y-8">
@@ -262,6 +259,5 @@ export default function ProfilePage() {
         )}
       </div>
     </div>
-    </>
   );
 }
