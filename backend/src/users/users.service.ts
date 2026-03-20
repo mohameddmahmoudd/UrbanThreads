@@ -42,6 +42,18 @@ export class UsersService {
       },
     });
 
+    // Fire-and-forget: sync profile to Gameball
+    this.gameball
+      .createOrUpdateCustomer(userId, {
+        email: user.email,
+        firstName: user.firstName ?? undefined,
+        lastName: user.lastName ?? undefined,
+        phone: user.phone ?? undefined,
+      })
+      .catch((err) =>
+        console.error('Gameball customer update failed:', err.message),
+      );
+
     // Check if profile is now complete and fire Gameball event once
     if (
       !user.isProfileCompleted &&

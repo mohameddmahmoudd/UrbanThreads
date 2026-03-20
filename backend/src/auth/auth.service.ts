@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { GameballService } from '../gameball/gameball.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -16,6 +17,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private gameball: GameballService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -37,6 +39,17 @@ export class AuthService {
 
     const tokens = await this.generateTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    // Fire-and-forget: create customer in Gameball
+    this.gameball
+      .createOrUpdateCustomer(user.id, {
+        email: dto.email,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+      })
+      .catch((err) =>
+        console.error('Gameball customer creation failed:', err.message),
+      );
 
     return { user, ...tokens };
   }
