@@ -144,7 +144,7 @@ export default function ProfilePage() {
               <Input label="Street" error={addressForm.formState.errors.street?.message} {...addressForm.register('street')} />
               <div className="grid grid-cols-2 gap-3">
                 <Input label="City" error={addressForm.formState.errors.city?.message} {...addressForm.register('city')} />
-                <Input label="State" {...addressForm.register('state')} />
+                <Input label="State / Governorate" {...addressForm.register('state')} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Country" error={addressForm.formState.errors.country?.message} {...addressForm.register('country')} />

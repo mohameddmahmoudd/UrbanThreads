@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/hooks/useCart';
+import { useAuthStore } from '@/store/auth.store';
 import type { ProductVariant } from '@/types/api.types';
 
 interface Props {
@@ -17,6 +19,7 @@ export function AddToCartButton({ productId, variants, basePrice }: Props) {
   );
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const user = useAuthStore((s) => s.user);
 
   const selectedPrice = selectedVariant
     ? variants.find((v) => v.id === selectedVariant)?.price || basePrice
@@ -79,17 +82,27 @@ export function AddToCartButton({ productId, variants, basePrice }: Props) {
         </span>
       </div>
 
-      <Button
-        onClick={handleAdd}
-        loading={addItem.isPending}
-        size="lg"
-        className="w-full"
-      >
-        Add to Cart
-      </Button>
-
-      {addItem.isSuccess && (
-        <p className="text-sm text-green-600">Added to cart!</p>
+      {user ? (
+        <>
+          <Button
+            onClick={handleAdd}
+            loading={addItem.isPending}
+            size="lg"
+            className="w-full"
+          >
+            Add to Cart
+          </Button>
+          {addItem.isSuccess && (
+            <p className="text-sm text-green-600">Added to cart!</p>
+          )}
+        </>
+      ) : (
+        <p className="text-sm text-gray-600">
+          <Link href="/login" className="font-medium text-black underline">
+            Log in
+          </Link>{' '}
+          to add items to your cart.
+        </p>
       )}
     </div>
   );
