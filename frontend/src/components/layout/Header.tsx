@@ -13,8 +13,8 @@ export function Header() {
   return (
     <header className="border-b bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold">
-          UrbanThreads
+        <Link href="/" className="text-2xl font-black tracking-tighter">
+          URBAN<span className="font-light">THREADS</span>
         </Link>
 
         <nav className="flex items-center gap-6">
