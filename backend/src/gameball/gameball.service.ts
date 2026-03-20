@@ -40,33 +40,39 @@ export class GameballService {
       phone?: string;
     },
   ): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/customers', {
-        customerId,
+    const requestBody = {
+      customerId,
+      email: attrs.email,
+      customerAttributes: {
+        firstName: attrs.firstName,
+        lastName: attrs.lastName,
         email: attrs.email,
-        customerAttributes: {
-          firstName: attrs.firstName,
-          lastName: attrs.lastName,
-          email: attrs.email,
-          mobile: attrs.phone,
-          channel: 'web',
-          joinDate: new Date().toISOString(),
-        },
-      }),
+        mobile: attrs.phone,
+        channel: 'web',
+        joinDate: new Date().toISOString(),
+      },
+    };
+    const response = await this.retryCall(() =>
+      this.client.post('/customers', requestBody),
     );
     this.logger.log(`Customer ${customerId} created/updated in Gameball`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async sendProfileCompletedEvent(customerId: string): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/events', {
-        customerId,
-        events: {
-          profile_completed: {},
-        },
-      }),
+    const requestBody = {
+      customerId,
+      events: {
+        profile_completed: {},
+      },
+    };
+    const response = await this.retryCall(() =>
+      this.client.post('/events', requestBody),
     );
     this.logger.log(`profile_completed event sent for customer ${customerId}`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async sendWriteReviewEvent(
@@ -74,20 +80,23 @@ export class GameballService {
     productId: string,
     hasImage: boolean,
   ): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/events', {
-        customerId,
-        events: {
-          write_review: {
-            product_id: productId,
-            has_image: hasImage,
-          },
+    const requestBody = {
+      customerId,
+      events: {
+        write_review: {
+          product_id: productId,
+          has_image: hasImage,
         },
-      }),
+      },
+    };
+    const response = await this.retryCall(() =>
+      this.client.post('/events', requestBody),
     );
     this.logger.log(
       `write_review event sent for customer ${customerId}, product ${productId}`,
     );
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async trackOrder(
@@ -96,32 +105,36 @@ export class GameballService {
     totalPaid: number,
     lineItems: LineItem[],
   ): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/orders', {
-        customerId,
-        orderId,
-        orderDate: new Date().toISOString(),
-        totalPaid,
-        lineItems: lineItems.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      }),
+    const requestBody = {
+      customerId,
+      orderId,
+      orderDate: new Date().toISOString(),
+      totalPaid,
+      lineItems: lineItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+    const response = await this.retryCall(() =>
+      this.client.post('/orders', requestBody),
     );
     this.logger.log(`Order ${orderId} tracked for customer ${customerId}`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async holdPoints(
     customerId: string,
     amount: number,
   ): Promise<{ holdReference: string; pointsRedeemed: number }> {
+    const requestBody = { customerId, amount };
     const response = await this.retryCall(() =>
-      this.client.post('/transactions/hold', {
-        customerId,
-        amount,
-      }),
+      this.client.post('/transactions/hold', requestBody),
     );
+    this.logger.log(`Points held for customer ${customerId}`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
     return {
       holdReference: response.data.holdReference,
       pointsRedeemed: response.data.pointsRedeemed ?? 0,
@@ -129,25 +142,26 @@ export class GameballService {
   }
 
   async releaseHold(holdReference: string): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/transactions/hold/reverse', {
-        holdReference,
-      }),
+    const requestBody = { holdReference };
+    const response = await this.retryCall(() =>
+      this.client.post('/transactions/hold/reverse', requestBody),
     );
     this.logger.log(`Hold ${holdReference} released`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async redeemPoints(
     customerId: string,
     holdReference: string,
   ): Promise<void> {
-    await this.retryCall(() =>
-      this.client.post('/transactions/redeem', {
-        customerId,
-        holdReference,
-      }),
+    const requestBody = { customerId, holdReference };
+    const response = await this.retryCall(() =>
+      this.client.post('/transactions/redeem', requestBody),
     );
     this.logger.log(`Points redeemed for customer ${customerId}`);
+    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async getWidgetToken(userId: string): Promise<string> {
@@ -167,7 +181,9 @@ export class GameballService {
 
   async getCustomerLoyalty(customerId: string) {
     try {
+      this.logger.log(`Request: GET /customer/${customerId}`);
       const response = await this.client.get(`/customer/${customerId}`);
+      this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error: any) {
       this.logger.warn(
