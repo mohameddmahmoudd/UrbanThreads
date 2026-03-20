@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reviewSchema, ReviewInput } from '@/lib/validations';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth.store';
 
 export function ReviewForm({ productId }: { productId: string }) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -47,6 +49,7 @@ export function ReviewForm({ productId }: { productId: string }) {
       }
       await api.upload(`/products/${productId}/reviews`, formData);
       setSuccess(true);
+      router.refresh();
     } catch (err: any) {
       setError(err.message || 'Failed to submit review');
     }
