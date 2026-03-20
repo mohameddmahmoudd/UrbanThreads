@@ -1,8 +1,10 @@
-import { api } from '@/lib/api';
 import type { Order } from '@/types/api.types';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -10,10 +12,16 @@ interface Props {
 
 export default async function OrderDetailPage({ params }: Props) {
   const { id } = await params;
+  const cookieHeader = (await cookies()).toString();
 
   let order: Order;
   try {
-    order = await api.get<Order>(`/orders/${id}`);
+    const res = await fetch(`${API_BASE}/orders/${id}`, {
+      headers: { Cookie: cookieHeader },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error();
+    order = await res.json();
   } catch {
     notFound();
   }
