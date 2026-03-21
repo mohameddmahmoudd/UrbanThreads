@@ -42,6 +42,11 @@ export class AdminController {
     return this.adminService.listProducts(page, limit);
   }
 
+  @Get('products/:id')
+  getProduct(@Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.getProduct(id);
+  }
+
   @Post('products')
   createProduct(@Body() dto: CreateProductDto) {
     return this.adminService.createProduct(dto);

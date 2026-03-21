@@ -39,7 +39,7 @@ export default function EditProductPage({ params }: Props) {
 
   useEffect(() => {
     Promise.all([
-      api.get<any>(`/products/${id}`),
+      api.get<any>(`/admin/products/${id}`),
       api.get<Category[]>('/categories'),
     ]).then(([product, cats]) => {
       setCategories(cats);

@@ -33,6 +33,18 @@ export class AdminService {
     };
   }
 
+  async getProduct(id: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: { select: { id: true, name: true } },
+        variants: true,
+      },
+    });
+    if (!product) throw new NotFoundException('Product not found');
+    return product;
+  }
+
   async createProduct(dto: CreateProductDto) {
     return this.prisma.product.create({
       data: {

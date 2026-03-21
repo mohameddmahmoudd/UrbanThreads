@@ -24,11 +24,11 @@ export class ReviewsService {
     dto: CreateReviewDto,
     imageUrl?: string,
   ) {
-    // Check product exists
+    // Check product exists and is active
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
-    if (!product) throw new NotFoundException('Product not found');
+    if (!product || !product.isActive) throw new NotFoundException('Product not found');
 
     // Verify purchase
     const purchased = await this.prisma.orderItem.findFirst({
