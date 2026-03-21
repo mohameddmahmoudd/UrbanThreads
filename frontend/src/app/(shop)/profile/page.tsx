@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { LoyaltyBalance } from '@/components/LoyaltyBalance';
 import type { Address, LoyaltyProfile } from '@/types/api.types';
 
 export default function ProfilePage() {
@@ -184,24 +185,13 @@ export default function ProfilePage() {
       {/* Right: Loyalty Dashboard */}
       <div>
         <h2 className="mb-4 text-2xl font-bold">Loyalty Rewards</h2>
-        
-          
 
-        {!loyalty || !loyalty.available ? (
-          <div className="rounded-md border p-6 text-center text-gray-500">
-            Loyalty data is currently unavailable.
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Points Balance */}
-            <div className="rounded-lg border bg-white p-6">
-              <p className="text-sm text-gray-500">Points Balance</p>
-              <p className="text-4xl font-bold">
-                {loyalty.pointsBalance?.toLocaleString() ?? 0}
-              </p>
-            </div>
+        {/* Customer Balance */}
+        <LoyaltyBalance />
 
-            {/* VIP Tier */}
+        {/* VIP Tier & Badges (from existing loyalty endpoint) */}
+        {loyalty?.available && (
+          <div className="mt-6 space-y-6">
             {loyalty.tier && (
               <div className="rounded-lg border bg-white p-6">
                 <p className="text-sm text-gray-500">VIP Tier</p>
@@ -211,7 +201,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Badges */}
             {loyalty.badges && loyalty.badges.length > 0 && (
               <div>
                 <h3 className="mb-3 text-lg font-semibold">Badges</h3>

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { SignJWT, CompactEncrypt } from 'jose';
@@ -127,36 +127,47 @@ export class GameballService {
   async holdPoints(
     customerId: string,
     amountToHold: number,
+    ignoreOtp: boolean,
   ): Promise<{ holdReference: string; pointsRedeemed: number }> {
     const transactionTime = new Date().toISOString();
-    const requestBody = { customerId, transactionTime, amountToHold };
-    const response = await this.retryCall(() =>
-      this.client.post('/transactions/hold', requestBody),
-    );
-    this.logger.log(`Points held for customer ${customerId}`);
-    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
-    this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
-    return {
-      holdReference: response.data.holdReference,
-      pointsRedeemed: response.data.holdEquivalentPoints ?? 0,
-    };
+    const requestBody = { customerId, transactionTime, amountToHold, ignoreOtp };
+    try {
+      const response = await this.retryCall(() =>
+        this.client.post('/transactions/hold', requestBody),
+      );
+      this.logger.log(`Points held for customer ${customerId}`);
+      this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
+      this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
+      return {
+        holdReference: response.data.holdReference,
+        pointsRedeemed: response.data.holdEquivalentPoints ?? 0,
+      };
+    } catch (error: any) {
+      const gbMessage = error?.response?.data?.message;
+      const status = error?.response?.status;
+      if (status === 422 && gbMessage) {
+        throw new BadRequestException(gbMessage);
+      }
+      throw error;
+    }
   }
 
   async releaseHold(holdReference: string): Promise<void> {
-    const requestBody = { holdReference };
     const response = await this.retryCall(() =>
-      this.client.post('/transactions/hold/reverse', requestBody),
+      this.client.delete(`/transactions/hold/${holdReference}`),
     );
     this.logger.log(`Hold ${holdReference} released`);
-    this.logger.log(`Request: ${JSON.stringify(requestBody)}`);
     this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
   }
 
   async redeemPoints(
     customerId: string,
+    transactionId: string,
     holdReference: string,
+    ignoreOtp: boolean,
   ): Promise<void> {
-    const requestBody = { customerId, holdReference };
+    const transactionTime = new Date().toISOString();
+    const requestBody = { customerId, transactionId, transactionTime, holdReference, ignoreOtp};
     const response = await this.retryCall(() =>
       this.client.post('/transactions/redeem', requestBody),
     );
@@ -178,6 +189,31 @@ export class GameballService {
       .encrypt(keyBytes);
 
     return jwe;
+  }
+
+  async getCustomerBalance(customerId: string) {
+    try {
+      this.logger.log(`Request: GET /customers/${customerId}/balance`);
+      const response = await this.client.get(
+        `/customers/${customerId}/balance`,
+      );
+      this.logger.log(
+        `Response [${response.status}]: ${JSON.stringify(response.data)}`,
+      );
+      return response.data;
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status === 404) {
+        this.logger.debug(
+          `Customer ${customerId} balance not found in Gameball (404)`,
+        );
+      } else {
+        this.logger.warn(
+          `Failed to fetch balance for ${customerId}: ${error.message}`,
+        );
+      }
+      return null;
+    }
   }
 
   async getCustomerLoyalty(customerId: string) {
@@ -212,9 +248,16 @@ export class GameballService {
       try {
         return await fn();
       } catch (error: any) {
+        const status = error?.response?.status;
+        const gbData = error?.response?.data;
+
         this.logger.warn(
-          `Gameball call failed (attempt ${attempt}/${retries}): ${error.message}`,
+          `Gameball call failed (attempt ${attempt}/${retries}): ${error.message}` +
+            (gbData ? ` | Response: ${JSON.stringify(gbData)}` : ''),
         );
+
+        // Don't retry client errors (4xx) — they won't succeed on retry
+        if (status && status >= 400 && status < 500) throw error;
         if (attempt === retries) throw error;
         await this.sleep(Math.pow(2, attempt) * 500);
       }

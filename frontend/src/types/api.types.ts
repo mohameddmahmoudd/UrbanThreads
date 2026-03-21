@@ -126,6 +126,21 @@ export interface LoyaltyProfile {
   available: boolean;
 }
 
+export interface CustomerBalance {
+  totalPointsBalance: number;
+  totalPointsValue: number;
+  availablePointsBalance: number;
+  availablePointsValue: number;
+  pendingPoints: number;
+  pendingPointsValue: number;
+  currency: string;
+  pointsName: string;
+  nextExpiringPointsAmount: number;
+  nextExpiringPointsValue: number;
+  nextExpiringPointsDate: string | null;
+  totalEarnedPoints: number;
+}
+
 // ─── Addresses ──────────────────────────────────────
 export interface Address {
   id: string;

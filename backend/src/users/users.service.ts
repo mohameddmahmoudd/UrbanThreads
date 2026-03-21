@@ -135,6 +135,10 @@ export class UsersService {
     return this.gameball.getCustomerLoyalty(userId);
   }
 
+  async getBalance(userId: string) {
+    return this.gameball.getCustomerBalance(userId);
+  }
+
   async getWidgetToken(userId: string) {
     const token = await this.gameball.getWidgetToken(userId);
     return { token };

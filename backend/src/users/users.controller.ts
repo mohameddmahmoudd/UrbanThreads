@@ -69,6 +69,11 @@ export class UsersController {
     return this.usersService.getLoyalty(userId);
   }
 
+  @Get('me/balance')
+  getBalance(@CurrentUser('id') userId: string) {
+    return this.usersService.getBalance(userId);
+  }
+
   @Get('me/widget-token')
   getWidgetToken(@CurrentUser('id') userId: string) {
     return this.usersService.getWidgetToken(userId);
