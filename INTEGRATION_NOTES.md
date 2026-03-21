@@ -4,14 +4,13 @@
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 15/TypeScript |
-| Backend | NestJS 11/TypeScript |
-| Database | PostgreSQL 16 + Prisma ORM |
-| Payments | Stripe Integration |
-| Loyalty | Gameball Integration |
-| Images | Cloudinary (when dockerized) / local filesystem (dev for me) |
-| Auth | JWT in httpOnly cookies |
-| Deployment | Docker Compose (Postgres + Backend + Frontend) |
+| Frontend | Next.js /TS|
+| Backend | NestJS /TS |
+| Database | **PostgreSQL + Prisma ORM** |
+| Payments | **Stripe Integration** |
+| Auth | **JWT in httpOnly cookies** |
+| Deployment | Docker Compose (DB+BE+FE) |
+| Attachments | Cloudinary (when dockerized) / local filesystem (dev for me) |
 
 ## Gameball Integration
 
@@ -35,7 +34,7 @@ All Gameball interaction goes through a single service: `backend/src/gameball/ga
 | **GET /configurations/tiers** | Fetch all tier definitions from the existing configuration. |
 | **GET /customer/{id}** | Fetch loyalty profile (points, tier, badges) |
 
-### I also integrated the gameball widget, the app embeds gameball's loyalty widget on the logged in user screens
+### I also integrated the gameball widget, the app embeds gameball's loyalty widget on the logged in user screens, and handled the new optional session token in the integration.
 
 ## Assumptions I made
 
@@ -49,9 +48,9 @@ I hardcode ignoreOtp: true on every hold and redeem call and never collect an OT
 Gameball point holds have a default 10 min expiry (configurable in dashboard). My cart stores the holdReference with no expiry tracking or refresh logic
 
 #### 4. Fire and forget is acceptable for point redemption
-After Stripe webhook confirms payment, I call gameball.redeemPoints(), if this call fails , the user pays a reduced amount via Stripe but their Gameball points are never deducted, there is no retry queue
+There is no retry queue.
 
-#### 5. No refund/reversal handling, coupon and cash back needed in the requirements
+#### 5. No refund/reversal handling, coupon and cash back mentioned in the requirements
 
 #### 6. Widget token generation via JWS+JWE for session token (not /hash endpoint)
 I generate widget authentication tokens on the backend: sign a JWT, then encrypt with JWE using the Gameball secret key
