@@ -88,6 +88,16 @@ export class AdminService {
     });
   }
 
+  async reactivateProduct(id: string) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) throw new NotFoundException('Product not found');
+
+    return this.prisma.product.update({
+      where: { id },
+      data: { isActive: true },
+    });
+  }
+
   async uploadProductImage(id: string, imageUrl: string) {
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Product not found');

@@ -65,6 +65,11 @@ export class AdminController {
     return this.adminService.deactivateProduct(id);
   }
 
+  @Patch('products/:id/reactivate')
+  reactivateProduct(@Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.reactivateProduct(id);
+  }
+
   @Post('products/:id/images')
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   async uploadProductImage(

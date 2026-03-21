@@ -17,14 +17,14 @@ export default function AdminProductsPage() {
   const deactivate = async (id: string) => {
     await api.delete(`/admin/products/${id}`);
     setProducts((prev) =>
-      prev
-        ? {
-            ...prev,
-            data: prev.data.map((p) =>
-              p.id === id ? { ...p, isActive: false } : p,
-            ) as any,
-          }
-        : null,
+      prev ? { ...prev, data: prev.data.map((p: any) => p.id === id ? { ...p, isActive: false } : p) } : null,
+    );
+  };
+
+  const reactivate = async (id: string) => {
+    await api.patch(`/admin/products/${id}/reactivate`, {});
+    setProducts((prev) =>
+      prev ? { ...prev, data: prev.data.map((p: any) => p.id === id ? { ...p, isActive: true } : p) } : null,
     );
   };
 
@@ -68,12 +68,19 @@ export default function AdminProductsPage() {
                   >
                     Edit
                   </Link>
-                  {product.isActive && (
+                  {product.isActive ? (
                     <button
                       onClick={() => deactivate(product.id)}
                       className="text-sm text-red-500 hover:underline"
                     >
                       Deactivate
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => reactivate(product.id)}
+                      className="text-sm text-green-600 hover:underline"
+                    >
+                      Reactivate
                     </button>
                   )}
                 </td>
