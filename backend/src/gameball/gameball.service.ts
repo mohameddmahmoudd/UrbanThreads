@@ -216,6 +216,61 @@ export class GameballService {
     }
   }
 
+  async getCustomerTierProgress(customerId: string) {
+    try {
+      this.logger.log(`Request: GET /customers/${customerId}/tier-progress`);
+      const response = await this.client.get(
+        `/customers/${customerId}/tier-progress`,
+      );
+      this.logger.log(
+        `Response [${response.status}]: ${JSON.stringify(response.data)}`,
+      );
+
+      // Gameball API typo: returns "minPorgress" instead of "minProgress"
+      const data = response.data;
+      const normalizeTier = (t: any) =>
+        t
+          ? {
+              ...t,
+              minProgress: t.minProgress ?? t.minPorgress ?? 0,
+            }
+          : t;
+      return {
+        ...data,
+        current: normalizeTier(data.current),
+        next: normalizeTier(data.next),
+      };
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status === 404) {
+        this.logger.debug(
+          `Customer ${customerId} tier progress not found (404)`,
+        );
+      } else {
+        this.logger.warn(
+          `Failed to fetch tier progress for ${customerId}: ${error.message}`,
+        );
+      }
+      return null;
+    }
+  }
+
+  async getTierConfigurations() {
+    try {
+      this.logger.log(`Request: GET /configurations/tiers`);
+      const response = await this.client.get('/configurations/tiers');
+      this.logger.log(
+        `Response [${response.status}]: ${JSON.stringify(response.data)}`,
+      );
+      return response.data;
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to fetch tier configurations: ${error.message}`,
+      );
+      return [];
+    }
+  }
+
   async getCustomerLoyalty(customerId: string) {
     try {
       this.logger.log(`Request: GET /customer/${customerId}`);

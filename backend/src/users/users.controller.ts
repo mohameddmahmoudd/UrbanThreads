@@ -74,6 +74,11 @@ export class UsersController {
     return this.usersService.getBalance(userId);
   }
 
+  @Get('me/tier-progress')
+  getTierProgress(@CurrentUser('id') userId: string) {
+    return this.usersService.getTierProgress(userId);
+  }
+
   @Get('me/widget-token')
   getWidgetToken(@CurrentUser('id') userId: string) {
     return this.usersService.getWidgetToken(userId);

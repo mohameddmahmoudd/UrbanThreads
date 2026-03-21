@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { LoyaltyBalance } from '@/components/LoyaltyBalance';
+import { VipTierWidget } from '@/components/VipTierWidget';
 import type { Address, LoyaltyProfile } from '@/types/api.types';
 
 export default function ProfilePage() {
@@ -189,61 +190,53 @@ export default function ProfilePage() {
         {/* Customer Balance */}
         <LoyaltyBalance />
 
-        {/* VIP Tier & Badges (from existing loyalty endpoint) */}
-        {loyalty?.available && (
-          <div className="mt-6 space-y-6">
-            {loyalty.tier && (
-              <div className="rounded-lg border bg-white p-6">
-                <p className="text-sm text-gray-500">VIP Tier</p>
-                <p className="text-xl font-semibold">
-                  {loyalty.tier.name || loyalty.tier}
-                </p>
-              </div>
-            )}
+        {/* VIP Tier Widget */}
+        <div className="mt-6">
+          <VipTierWidget />
+        </div>
 
-            {loyalty.badges && loyalty.badges.length > 0 && (
-              <div>
-                <h3 className="mb-3 text-lg font-semibold">Badges</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {loyalty.badges.map((badge: any, index: number) => (
-                    <div
-                      key={index}
-                      className={`rounded-lg border p-4 ${
-                        badge.achieved
-                          ? 'border-green-200 bg-green-50'
-                          : 'border-gray-200 bg-gray-50'
-                      }`}
-                    >
-                      {badge.icon && (
-                        <img
-                          src={badge.icon}
-                          alt={badge.name}
-                          className="mb-2 h-10 w-10"
+        {/* Badges (from existing loyalty endpoint) */}
+        {loyalty?.available && loyalty.badges && loyalty.badges.length > 0 && (
+          <div className="mt-6">
+            <h3 className="mb-3 text-lg font-semibold">Badges</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {loyalty.badges.map((badge: any, index: number) => (
+                <div
+                  key={index}
+                  className={`rounded-lg border p-4 ${
+                    badge.achieved
+                      ? 'border-green-200 bg-green-50'
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  {badge.icon && (
+                    <img
+                      src={badge.icon}
+                      alt={badge.name}
+                      className="mb-2 h-10 w-10"
+                    />
+                  )}
+                  <p className="font-medium">{badge.name || `Badge ${index + 1}`}</p>
+                  {badge.achieved ? (
+                    <Badge variant="success">Achieved</Badge>
+                  ) : (
+                    <div className="mt-1">
+                      <div className="h-2 w-full rounded-full bg-gray-200">
+                        <div
+                          className="h-2 rounded-full bg-black"
+                          style={{
+                            width: `${Math.min(badge.progress || 0, 100)}%`,
+                          }}
                         />
-                      )}
-                      <p className="font-medium">{badge.name || `Badge ${index + 1}`}</p>
-                      {badge.achieved ? (
-                        <Badge variant="success">Achieved</Badge>
-                      ) : (
-                        <div className="mt-1">
-                          <div className="h-2 w-full rounded-full bg-gray-200">
-                            <div
-                              className="h-2 rounded-full bg-black"
-                              style={{
-                                width: `${Math.min(badge.progress || 0, 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <p className="mt-1 text-xs text-gray-500">
-                            {badge.progress || 0}% complete
-                          </p>
-                        </div>
-                      )}
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {badge.progress || 0}% complete
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
       </div>

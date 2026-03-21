@@ -129,8 +129,8 @@ export interface LoyaltyProfile {
 export interface CustomerBalance {
   totalPointsBalance: number;
   totalPointsValue: number;
-  availablePointsBalance: number;
-  availablePointsValue: number;
+  avaliablePointsBalance: number; // Gameball API typo — missing 'i'
+  avaliablePointsValue: number;   // Gameball API typo — missing 'i'
   pendingPoints: number;
   pendingPointsValue: number;
   currency: string;
@@ -139,6 +139,38 @@ export interface CustomerBalance {
   nextExpiringPointsValue: number;
   nextExpiringPointsDate: string | null;
   totalEarnedPoints: number;
+}
+
+export interface TierState {
+  order: number;
+  name: string;
+  minProgress: number;
+  icon: string;
+}
+
+export interface TierBenefit {
+  type: string;
+  description: string | null;
+  hyperLink: string | null;
+  rankReward: number;
+  walletReward: number;
+  rewardWalletFactor: number | null; // Gameball API field name (points multiplier)
+  couponReward: any | null;
+}
+
+export interface TierConfig {
+  name: string;
+  minProgress: number;
+  order: number;
+  icon: string;
+  benefits: TierBenefit[];
+}
+
+export interface TierProgress {
+  current: TierState | null;
+  next: TierState | null;
+  progress: number;
+  tiers: TierConfig[];
 }
 
 // ─── Addresses ──────────────────────────────────────

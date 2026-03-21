@@ -139,6 +139,14 @@ export class UsersService {
     return this.gameball.getCustomerBalance(userId);
   }
 
+  async getTierProgress(userId: string) {
+    const [progress, tiers] = await Promise.all([
+      this.gameball.getCustomerTierProgress(userId),
+      this.gameball.getTierConfigurations(),
+    ]);
+    return { ...(progress || {}), tiers: Array.isArray(tiers) ? tiers : [] };
+  }
+
   async getWidgetToken(userId: string) {
     const token = await this.gameball.getWidgetToken(userId);
     return { token };
