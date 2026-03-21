@@ -22,12 +22,14 @@ export function useAuth() {
     password: string,
     firstName?: string,
     lastName?: string,
+    adminPin?: string,
   ) => {
     const res = await api.post<AuthResponse>('/auth/register', {
       email,
       password,
       firstName,
       lastName,
+      ...(adminPin && { adminPin }),
     });
     const profile = await api.get<User>('/users/me');
     setUser(profile);

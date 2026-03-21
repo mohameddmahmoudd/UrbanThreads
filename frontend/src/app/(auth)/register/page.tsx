@@ -19,15 +19,25 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
+    defaultValues: { isAdmin: false },
   });
+
+  const isAdmin = watch('isAdmin');
 
   const onSubmit = async (data: RegisterInput) => {
     setError('');
     try {
-      await registerUser(data.email, data.password, data.firstName, data.lastName);
+      await registerUser(
+        data.email,
+        data.password,
+        data.firstName,
+        data.lastName,
+        data.isAdmin ? data.adminPin : undefined,
+      );
       router.push('/');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Registration failed');
@@ -73,6 +83,31 @@ export default function RegisterPage() {
           error={errors.password?.message}
           {...register('password')}
         />
+
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+              {...register('isAdmin')}
+            />
+            Register as Admin
+          </label>
+
+          {isAdmin && (
+            <Input
+              id="adminPin"
+              label="Admin PIN"
+              type="password"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="4-digit PIN"
+              error={errors.adminPin?.message}
+              {...register('adminPin')}
+            />
+          )}
+        </div>
+
         <Button type="submit" loading={isSubmitting} className="w-full">
           Register
         </Button>

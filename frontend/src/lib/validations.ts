@@ -5,12 +5,19 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export const registerSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').max(100),
-  lastName: z.string().min(1, 'Last name is required').max(100),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
+export const registerSchema = z
+  .object({
+    firstName: z.string().min(1, 'First name is required').max(100),
+    lastName: z.string().min(1, 'Last name is required').max(100),
+    email: z.string().email('Invalid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    isAdmin: z.boolean().optional(),
+    adminPin: z.string().length(4, 'PIN must be exactly 4 digits').optional(),
+  })
+  .refine((data) => !data.isAdmin || (data.adminPin && /^\d{4}$/.test(data.adminPin)), {
+    message: 'A 4-digit PIN is required to register as admin',
+    path: ['adminPin'],
+  });
 
 export const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(100),

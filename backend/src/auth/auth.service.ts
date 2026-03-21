@@ -1,6 +1,7 @@
 import {
   Injectable,
   ConflictException,
+  ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -26,6 +27,15 @@ export class AuthService {
     });
     if (existing) throw new ConflictException('Email already registered');
 
+    let role: 'CUSTOMER' | 'ADMIN' = 'CUSTOMER';
+    if (dto.adminPin) {
+      const expectedPin = this.config.getOrThrow('ADMIN_PIN');
+      if (dto.adminPin !== expectedPin) {
+        throw new ForbiddenException('Invalid admin PIN');
+      }
+      role = 'ADMIN';
+    }
+
     const hash = await bcrypt.hash(dto.password, 12);
     const user = await this.prisma.user.create({
       data: {
@@ -33,6 +43,7 @@ export class AuthService {
         passwordHash: hash,
         firstName: dto.firstName,
         lastName: dto.lastName,
+        role,
       },
       select: { id: true, email: true, role: true },
     });
