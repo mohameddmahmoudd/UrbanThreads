@@ -1,0 +1,13 @@
+node_modules
+*/node_modules
+.next
+frontend/.next
+dist
+backend/dist
+coverage
+uploads
+.git
+*.log
+.env
+.env.*
+.DS_Store

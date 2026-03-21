@@ -88,10 +88,10 @@ export function ReviewForm({ productId }: { productId: string }) {
         ref={fileRef}
         type="file"
         accept="image/*"
-        className="mb-3 block text-sm text-gray-500"
+        className="mb-3 block w-full cursor-pointer rounded-md border border-gray-300 text-xs text-gray-500 file:mr-2 file:cursor-pointer file:rounded-l-md file:border-0 file:bg-black file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white hover:file:bg-gray-800"
       />
 
-      <Button type="submit" size="sm" loading={isSubmitting}>
+      <Button type="submit" loading={isSubmitting}>
         Submit Review
       </Button>
     </form>
