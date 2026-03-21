@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: gameball-postgres
+    container_name: urbanthreads-postgres
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: gameball
-      POSTGRES_PASSWORD: gameball_dev
-      POSTGRES_DB: gameball_ecommerce
+      POSTGRES_USER: urbanthreads
+      POSTGRES_PASSWORD: urbanthreads_dev
+      POSTGRES_DB: UrbanThreadsDB
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gameball -d gameball_ecommerce"]
+      test: ["CMD-SHELL", "pg_isready -U urbanthreads -d UrbanThreadsDB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,14 +34,11 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api}
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-        NEXT_PUBLIC_GAMEBALL_API_KEY: ${NEXT_PUBLIC_GAMEBALL_API_KEY}
     container_name: gameball-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file: .env.docker
     depends_on:
       - backend
 
