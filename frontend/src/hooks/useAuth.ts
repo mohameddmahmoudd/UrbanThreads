@@ -44,7 +44,7 @@ export function useAuth() {
 
   const fetchProfile = async () => {
     try {
-      const profile = await api.get<User>('/users/me');
+      const profile = await api.get<User>('/users/me', { skipRefresh: true });
       setUser(profile);
       return profile;
     } catch (err) {

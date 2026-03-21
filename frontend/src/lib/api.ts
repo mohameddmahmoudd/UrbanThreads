@@ -1,5 +1,7 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
+type RequestOptions = RequestInit & { skipRefresh?: boolean };
+
 class ApiClient {
   private baseUrl: string;
 
@@ -9,19 +11,20 @@ class ApiClient {
 
   async request<T>(
     path: string,
-    options: RequestInit = {},
+    options: RequestOptions = {},
   ): Promise<T> {
+    const { skipRefresh, ...fetchOptions } = options;
     const url = `${this.baseUrl}${path}`;
     const res = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...fetchOptions.headers,
       },
     });
 
-    if (res.status === 401 && this.shouldTryRefresh(path)) {
+    if (res.status === 401 && !skipRefresh && this.shouldTryRefresh(path)) {
       // Attempt token refresh
       const refreshRes = await fetch(`${this.baseUrl}/auth/refresh`, {
         method: 'POST',
@@ -56,8 +59,8 @@ class ApiClient {
     return text ? JSON.parse(text) : ({} as T);
   }
 
-  get<T>(path: string) {
-    return this.request<T>(path);
+  get<T>(path: string, options?: RequestOptions) {
+    return this.request<T>(path, options);
   }
 
   post<T>(path: string, body?: unknown) {
