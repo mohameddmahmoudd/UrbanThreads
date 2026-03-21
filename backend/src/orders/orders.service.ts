@@ -199,8 +199,9 @@ export class OrdersService {
 
     // Gameball: finalize point redemption if hold was used
     if (holdReference) {
+      const ignoreOtp = true; // Ignore OTP verification for now TODO: add OTP verification
       this.gameball
-        .redeemPoints(userId, holdReference)
+        .redeemPoints(userId, paymentIntent.id, holdReference, ignoreOtp) 
         .catch((err) =>
           this.logger.error(
             `Gameball redeemPoints failed for order ${order.id}: ${err.message}`,

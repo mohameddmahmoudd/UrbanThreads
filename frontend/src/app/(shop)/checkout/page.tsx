@@ -83,10 +83,19 @@ export default function CheckoutPage() {
     }
   }, [addresses, selectedAddress]);
 
+  const [holdError, setHoldError] = useState('');
+
   const handleHoldPoints = async () => {
     const amount = parseFloat(pointsAmount);
     if (isNaN(amount) || amount <= 0) return;
-    holdPoints.mutate(amount);
+    setHoldError('');
+    holdPoints.mutate(amount, {
+      onError: (err) => {
+        setHoldError(
+          err instanceof ApiError ? err.message : 'Failed to apply discount',
+        );
+      },
+    });
   };
 
   const handleCreateOrder = async () => {
@@ -183,7 +192,7 @@ export default function CheckoutPage() {
             loading={holdPoints.isPending}
             size="sm"
           >
-            Hold Points
+            Apply Discount
           </Button>
           {cart.holdReference && (
             <Button
@@ -192,10 +201,13 @@ export default function CheckoutPage() {
               loading={releasePoints.isPending}
               size="sm"
             >
-              Release
+              Remove Discount
             </Button>
           )}
         </div>
+        {holdError && (
+          <p className="mt-2 text-sm text-red-600">{holdError}</p>
+        )}
         {cart.holdAmount && cart.holdAmount > 0 && (
           <p className="mt-2 text-sm text-green-600">
             ${cart.holdAmount.toFixed(2)} discount applied

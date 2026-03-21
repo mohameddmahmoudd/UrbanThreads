@@ -125,8 +125,8 @@ export class CartService {
         .releaseHold(cart.holdReference)
         .catch(() => {}); // ignore errors on release
     }
-
-    const result = await this.gameball.holdPoints(userId, amount);
+    // Ignore OTP verification for now TODO: add OTP verification
+    const result = await this.gameball.holdPoints(userId, amount, true);
 
     await this.prisma.cart.update({
       where: { id: cart.id },

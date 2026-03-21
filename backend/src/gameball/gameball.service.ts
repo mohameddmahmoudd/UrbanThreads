@@ -126,9 +126,10 @@ export class GameballService {
 
   async holdPoints(
     customerId: string,
-    amount: number,
+    amountToHold: number,
   ): Promise<{ holdReference: string; pointsRedeemed: number }> {
-    const requestBody = { customerId, amount };
+    const transactionTime = new Date().toISOString();
+    const requestBody = { customerId, transactionTime, amountToHold };
     const response = await this.retryCall(() =>
       this.client.post('/transactions/hold', requestBody),
     );
@@ -137,7 +138,7 @@ export class GameballService {
     this.logger.log(`Response [${response.status}]: ${JSON.stringify(response.data)}`);
     return {
       holdReference: response.data.holdReference,
-      pointsRedeemed: response.data.pointsRedeemed ?? 0,
+      pointsRedeemed: response.data.holdEquivalentPoints ?? 0,
     };
   }
 
