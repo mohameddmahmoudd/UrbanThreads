@@ -1,27 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
 import type { TierProgress, TierConfig, TierBenefit } from '@/types/api.types';
 
 type TierStatus = 'completed' | 'current' | 'in-progress' | 'locked';
 
-export function VipTierWidget() {
-  const [data, setData] = useState<TierProgress | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api
-      .get<TierProgress>('/users/me/tier-progress')
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return <div className="h-48 animate-pulse rounded-lg bg-gray-100" />;
-  }
-
+export function VipTierWidget({ data }: { data: TierProgress | null }) {
   if (!data?.current) return null;
 
   const { current, next, progress, tiers } = data;

@@ -64,11 +64,6 @@ export class UsersController {
     return this.usersService.deleteAddress(userId, addressId);
   }
 
-  @Get('me/loyalty')
-  getLoyalty(@CurrentUser('id') userId: string) {
-    return this.usersService.getLoyalty(userId);
-  }
-
   @Get('me/balance')
   getBalance(@CurrentUser('id') userId: string) {
     return this.usersService.getBalance(userId);

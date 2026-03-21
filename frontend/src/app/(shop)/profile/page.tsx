@@ -11,12 +11,12 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { LoyaltyBalance } from '@/components/LoyaltyBalance';
 import { VipTierWidget } from '@/components/VipTierWidget';
-import type { Address, LoyaltyProfile } from '@/types/api.types';
+import type { Address, TierProgress } from '@/types/api.types';
 
 export default function ProfilePage() {
   const { user, fetchProfile } = useAuth();
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [loyalty, setLoyalty] = useState<LoyaltyProfile | null>(null);
+  const [tierData, setTierData] = useState<TierProgress | null>(null);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -36,7 +36,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     api.get<Address[]>('/users/me/addresses').then(setAddresses).catch(() => {});
-    api.get<LoyaltyProfile>('/users/me/loyalty').then(setLoyalty).catch(() => {});
+    api.get<TierProgress>('/users/me/tier-progress').then(setTierData).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -192,15 +192,15 @@ export default function ProfilePage() {
 
         {/* VIP Tier Widget */}
         <div className="mt-6">
-          <VipTierWidget />
+          <VipTierWidget data={tierData} />
         </div>
 
-        {/* Badges (from existing loyalty endpoint) */}
-        {loyalty?.available && loyalty.badges && loyalty.badges.length > 0 && (
+        {/* Badges */}
+        {tierData?.badges && tierData.badges.length > 0 && (
           <div className="mt-6">
             <h3 className="mb-3 text-lg font-semibold">Badges</h3>
             <div className="grid grid-cols-2 gap-3">
-              {loyalty.badges.map((badge: any, index: number) => (
+              {tierData.badges.map((badge: any, index: number) => (
                 <div
                   key={index}
                   className={`rounded-lg border p-4 ${

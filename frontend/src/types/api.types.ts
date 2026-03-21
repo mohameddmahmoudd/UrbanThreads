@@ -119,13 +119,6 @@ export interface Review {
 }
 
 // ─── Loyalty ────────────────────────────────────────
-export interface LoyaltyProfile {
-  pointsBalance: number | null;
-  tier: any;
-  badges: any[];
-  available: boolean;
-}
-
 export interface CustomerBalance {
   totalPointsBalance: number;
   totalPointsValue: number;
@@ -171,6 +164,7 @@ export interface TierProgress {
   next: TierState | null;
   progress: number;
   tiers: TierConfig[];
+  badges: any[];
 }
 
 // ─── Addresses ──────────────────────────────────────

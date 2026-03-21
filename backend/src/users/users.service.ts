@@ -131,20 +131,21 @@ export class UsersService {
 
   // ─── Loyalty ────────────────────────────────────────
 
-  async getLoyalty(userId: string) {
-    return this.gameball.getCustomerLoyalty(userId);
-  }
-
   async getBalance(userId: string) {
     return this.gameball.getCustomerBalance(userId);
   }
 
   async getTierProgress(userId: string) {
-    const [progress, tiers] = await Promise.all([
+    const [progress, tiers, loyalty] = await Promise.all([
       this.gameball.getCustomerTierProgress(userId),
       this.gameball.getTierConfigurations(),
+      this.gameball.getCustomerLoyalty(userId),
     ]);
-    return { ...(progress || {}), tiers: Array.isArray(tiers) ? tiers : [] };
+    return {
+      ...(progress || {}),
+      tiers: Array.isArray(tiers) ? tiers : [],
+      badges: loyalty?.badges ?? [],
+    };
   }
 
   async getWidgetToken(userId: string) {
