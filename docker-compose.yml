@@ -30,6 +30,16 @@ services:
       postgres:
         condition: service_healthy
 
+  bootstrap:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env.docker
+    command: ["sh", "-c", "../node_modules/.bin/prisma migrate deploy && node prisma/bootstrap.js"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   frontend:
     build:
       context: .

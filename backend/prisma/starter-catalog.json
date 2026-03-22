@@ -1,0 +1,29 @@
+{
+  "categories": [
+    { "name": "Men" },
+    { "name": "Winter Collection" }
+  ],
+  "products": [
+    {
+      "name": "Basic Hoodie",
+      "description": "A basic black hoodie built for everyday wear. Made from soft, comfortable fabric with a relaxed fit, it features a classic hood, long sleeves, and a practical front pocket. Simple, clean, and reliable for casual use.",
+      "basePrice": 99.99,
+      "category": "Winter Collection",
+      "imageUrl": "https://res.cloudinary.com/dqi2np9am/image/upload/v1774082379/hoodieBlck_ihs3xg.webp"
+    },
+    {
+      "name": "Basic Black Denim",
+      "description": "Black Jeans are our new denim style, designed with a modern barrel-shaped leg that narrows slightly at the ankle and features a cropped length for a contemporary look. The jeans come with practical front and back pockets and a classic denim finish that makes them easy to style for everyday wear.",
+      "basePrice": 149.99,
+      "category": "Men",
+      "imageUrl": "https://res.cloudinary.com/dqi2np9am/image/upload/v1774082379/blackJeans_l5ogkl.webp"
+    },
+    {
+      "name": "Basic White Tee",
+      "description": "A classic white men’s tee designed for everyday comfort and easy styling. Made from soft, breathable fabric, it features a clean look with a regular fit that works well on its own or layered under jackets and shirts. Simple, versatile, and essential for any casual wardrobe.",
+      "basePrice": 49.99,
+      "category": "Men",
+      "imageUrl": "https://res.cloudinary.com/dqi2np9am/image/upload/v1774082379/whiteTee_xtvwbq.webp"
+    }
+  ]
+}
