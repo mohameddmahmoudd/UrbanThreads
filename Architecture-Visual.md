@@ -56,18 +56,18 @@ backend/src/gameball/gameball.service.ts
 
 | Method&Endpoint                                   | Method                                                                                           | Called From                                                                                                                                         | Purpose                                      |
 |---------------------------------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| `POST /customers`                                 | [`createOrUpdateCustomer()`](backend/src/gameball/gameball.service.ts#L34)                       | [Auth (register)](backend/src/auth/auth.service.ts#L55), [Users (profile update)](backend/src/users/users.service.ts#L46)                           | Create or update a customer profile          |
-| `POST /events`                                    | [`sendProfileCompletedEvent()`](backend/src/gameball/gameball.service.ts#L63)                    | [Users (profile completion)](backend/src/users/users.service.ts#L71)                                                                                | Fire behavioral events                       |
-| `POST /events`                                    | [`sendWriteReviewEvent()`](backend/src/gameball/gameball.service.ts#L78)                         | [Reviews (on creation)](backend/src/reviews/reviews.service.ts#L63)                                                                                 | Fire behavioral events                       |
-| `POST /orders`                                    | [`trackOrder()`](backend/src/gameball/gameball.service.ts#L102)                                  | [Orders (after payment success)](backend/src/orders/orders.service.ts#L183)                                                                         | Track a purchase for point earning           |
-| `POST /transactions/hold`                         | [`holdPoints()`](backend/src/gameball/gameball.service.ts#L127)                                  | [Cart (user requests redemption)](backend/src/cart/cart.service.ts#L129)                                                                            | Hold points for checkout redemption          |
-| `DELETE /transactions/hold/{holdReference}`       | [`releaseHold()`](backend/src/gameball/gameball.service.ts#L155)                                 | [Cart (user cancels or replaces hold)](backend/src/cart/cart.service.ts#L124)                                                                       | Release a point hold                         |
-| `POST /transactions/redeem`                       | [`redeemPoints()`](backend/src/gameball/gameball.service.ts#L163)                                | [Orders (after payment success)](backend/src/orders/orders.service.ts#L203)                                                                         | Finalize point redemption after payment      |
-| `GET /customers/{id}/balance`                     | [`getCustomerBalance()`](backend/src/gameball/gameball.service.ts#L194)                          | [Users (balance widget)](backend/src/users/users.service.ts#L135)                                                                                   | Fetch point balance and tier info            |
-| `GET /customers/{id}/tier-progress`               | [`getCustomerTierProgress()`](backend/src/gameball/gameball.service.ts#L219)                     | [Users (tier widget)](backend/src/users/users.service.ts#L140)                                                                                      | Fetch tier progression details               |
-| `GET /configurations/tiers`                       | [`getTierConfigurations()`](backend/src/gameball/gameball.service.ts#L258)                       | [Users (tier widget)](backend/src/users/users.service.ts#L141)                                                                                      | Fetch all tier definitions                   |
-| `GET /customer/{id}`                              | [`getCustomerLoyalty()`](backend/src/gameball/gameball.service.ts#L274)                          | [Users (tier widget)](backend/src/users/users.service.ts#L142)                                                                                      | Fetch full loyalty profile (points, badges)  |
-| Local (JWT generation)                            | [`getWidgetToken()`](backend/src/gameball/gameball.service.ts#L179)                              | [Users (embedded widget)](backend/src/users/users.service.ts#L152)                                                                                  | Generate encrypted widget token              |
+| `POST /customers`                                 | `createOrUpdateCustomer()`                       | Auth (register), Users (profile update)                           | Create or update a customer profile          |
+| `POST /events`                                    | `sendProfileCompletedEvent()`                    | Users (profile completion)                                                                                | Fire behavioral events                       |
+| `POST /events`                                    | `sendWriteReviewEvent()`                         | Reviews (on creation)                                                                                 | Fire behavioral events                       |
+| `POST /orders`                                    | `trackOrder()`                                  | Orders (after payment success)                                                                         | Track a purchase for point earning           |
+| `POST /transactions/hold`                         | `holdPoints()`                                  | Cart (user requests redemption)                                                                            | Hold points for checkout redemption          |
+| `DELETE /transactions/hold/{holdReference}`       | `releaseHold()`                                 | Cart (user cancels or replaces hold)                                                                       | Release a point hold                         |
+| `POST /transactions/redeem`                       | `redeemPoints()`                                | Orders (after payment success)                                                                         | Finalize point redemption after payment      |
+| `GET /customers/{id}/balance`                     | `getCustomerBalance()`                          | Users (balance widget)                                                                                   | Fetch point balance and tier info            |
+| `GET /customers/{id}/tier-progress`               | `getCustomerTierProgress()`                     | Users (tier widget)                                                                                      | Fetch tier progression details               |
+| `GET /configurations/tiers`                       | `getTierConfigurations()`                       | Users (tier widget)                                                                                      | Fetch all tier definitions                   |
+| `GET /customer/{id}`                              | `getCustomerLoyalty()`                          | Users (tier widget)                                                                                      | Fetch full loyalty profile (points, badges)  |
+| Local (JWT generation)                            | `getWidgetToken()`                              | Users (embedded widget)                                                                                  | Generate encrypted widget token              |
 
 ## 5. Critical Runtime Flows
 
@@ -151,29 +151,17 @@ sequenceDiagram
 | COD orders | Delay earning/cashback until the order is delivered or cash is collected |
 | Refunds/cancellations | Reverse or compensate loyalty transactions; do not leave earned/redeemed points unadjusted |
 | Point holds | Track expiry and refresh or release holds when checkout stalls |
-| Retries | Queue  Gameball writes to avoid data loss |
+| Retries | Queue writes to avoid data loss |
 | Customer identity | Use stable UUIDs, not mutable fields like email or phone |
 | Secrets | Store in env vars or secret manager only; never commit them |
 
-### Common pitfalls
-
-| Pitfall | Why it matters |
-| --- | --- |
-| Sending earning before payment settles | Customers get points for unpaid or failed orders |
-| Ignoring refunds | Loyalty balances drift away from real business state |
-| Hardcoding `ignoreOtp: true` when OTP is enabled in Gameball | Redemption and hold flows will no longer match your security setup |
-| Using email as `customerId` | Customer identity breaks when the email changes |
-| Exposing secret key in frontend | Compromises the whole integration |
-| Holding points without expiry handling | Discounts can silently expire mid-checkout |
-| No retry/replay path for async calls | Orders may be paid but never reflected in loyalty |
-| Assuming Gameball payloads are perfectly shaped | There are field inconsistencies such as `minPorgress` and `avaliablePointsBalance` |
 
 ## 8. Dos and Don’ts Tips
 
 ### Do
 
 - **Keep a local order record first** — persist the order and payment to the database before any Gameball call, so the source of truth is always local.
-- **When adjusting points manually, make sure your app knows** — Stripe may deliver `payment_intent.succeeded` more than once; guard against double earning.
+- **When adjusting points manually, make sure your app knows** — We want to avoid incorrect data
 - **Make webhook driven flows idempotent** — Stripe may deliver `payment_intent.succeeded` more than once; guard against double earning.
 - **Plan reversal flows** refunds and cancellations must adjust loyalty; do not leave earned or redeemed points unadjusted.
 - **Replace fire-and-forget with a job queue in production** — `trackOrder()` and `redeemPoints()` can silently fail after payment has already settled; a persistent queue (e.g. BullMQ) ensures replay.
@@ -184,3 +172,5 @@ sequenceDiagram
 
 - **Don’t expose the API key or secret key** — store them in environment variables only; never commit or ship them to the client.
 - **Don’t let the frontend call Gameball APIs directly** — all loyalty logic runs server-side through `GameballService`.
+- **Don’t silently swallow Gameball errors** — especially for writes (earn, redeem, hold) a silent failure means real money and real points fall out of sync with no trace.
+- **Don’t block the checkout response on Gameball** — `redeemPoints()` and `trackOrder()` should not gate the HTTP response back to the user; offload them to a background job so a Gameball timeout never breaks a completed payment.
