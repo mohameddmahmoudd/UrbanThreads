@@ -167,10 +167,10 @@ async function upsertBootstrapAdmin(tx, admin) {
         role: 'ADMIN',
       },
     });
-    return 'updated';
+    return { action: 'updated', userId: existing.id };
   }
 
-  await tx.user.create({
+  const created = await tx.user.create({
     data: {
       email: admin.email,
       passwordHash,
@@ -178,7 +178,67 @@ async function upsertBootstrapAdmin(tx, admin) {
       lastName: admin.lastName,
       role: 'ADMIN',
     },
+    select: { id: true },
   });
+  return { action: 'created', userId: created.id };
+}
+
+async function upsertBootstrapAdminAddress(tx, userId) {
+  const addressSeed = {
+    label: 'Home',
+    street: '123 Street',
+    city: 'New Cairo',
+    state: 'Cairo',
+    country: 'Egypt',
+    postalCode: '11511',
+    isDefault: true,
+  };
+
+  const matches = await tx.address.findMany({
+    where: {
+      userId,
+      label: addressSeed.label,
+    },
+    select: { id: true },
+  });
+
+  if (matches.length > 1) {
+    throw new Error(
+      `Ambiguous admin addresses found for userId="${userId}" and label="${addressSeed.label}".`,
+    );
+  }
+
+  if (matches.length === 1) {
+    const addressId = matches[0].id;
+    await tx.address.update({
+      where: { id: addressId },
+      data: addressSeed,
+    });
+
+    await tx.address.updateMany({
+      where: {
+        userId,
+        isDefault: true,
+        id: { not: addressId },
+      },
+      data: { isDefault: false },
+    });
+
+    return 'updated';
+  }
+
+  await tx.address.updateMany({
+    where: { userId, isDefault: true },
+    data: { isDefault: false },
+  });
+
+  await tx.address.create({
+    data: {
+      userId,
+      ...addressSeed,
+    },
+  });
+
   return 'created';
 }
 
@@ -295,18 +355,21 @@ async function main() {
   const catalog = validateAndNormalizeCatalog(starterCatalog);
 
   const result = await prisma.$transaction(async (tx) => {
-    const adminAction = await upsertBootstrapAdmin(tx, admin);
+    const adminResult = await upsertBootstrapAdmin(tx, admin);
+    const adminAddressAction = await upsertBootstrapAdminAddress(tx, adminResult.userId);
     const categoryResult = await seedCategories(tx, catalog.categories);
     const productResult = await seedProducts(tx, catalog.products, categoryResult.categoryIdsByName);
 
     return {
-      adminAction,
+      adminAction: adminResult.action,
+      adminAddressAction,
       categories: categoryResult,
       products: productResult,
     };
   });
 
   console.log(`[bootstrap] Admin ${result.adminAction}: ${admin.email}`);
+  console.log(`[bootstrap] Admin address ${result.adminAddressAction}`);
   console.log(
     `[bootstrap] Categories seeded. created=${result.categories.createdCount}, reused=${result.categories.reusedCount}`,
   );
