@@ -9,6 +9,9 @@ This guide walks you through running the project locally. No programming experie
 
 > **Windows users:** During installation, Docker may ask you to enable **WSL2** (Windows Subsystem for Linux). Follow the on screen prompts to do so, it is required for Docker to work on Windows.
 
+**Stripe CLI** — required to receive payment webhook events locally
+> Download it from [https://docs.stripe.com/stripe-cli]
+
 ## Step by Step Setup
 
 **1. Get the project files**
@@ -41,14 +44,25 @@ Then run:
 docker compose --env-file .env.docker up --build
 ```
 
-**4. Wait for the app to be ready**
+**4. Start the Stripe webhook listener**
+
+> First time only: run `stripe login` and authenticate using the Stripe credentials in the Additional Notes section below.
+
+Open a new terminal window and run:
+```
+stripe listen --forward-to localhost:4000/payments/webhook
+```
+
+Keep this terminal open while using the app — it is required for payments to complete successfully.
+
+**5. Wait for the app to be ready**
 
 Watch the terminal output. Once you see this line, the app is fully up:
 ```
 Backend running on http://localhost:4000
 ```
 
-**5. Open the app in your browser**
+**6. Open the app in your browser**
 
 Navigate to: [http://localhost:3000](http://localhost:3000)
 
@@ -66,6 +80,10 @@ Use the bootstrapped admin account to log in:
 ---
 
 ## Additional Notes
+
+**Stripe Credentials**
+Email: mohamedmahmoudx20@gmail.com
+Password: MUser357##
 
 **Stripe Test Payments**
 
