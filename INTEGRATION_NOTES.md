@@ -40,7 +40,7 @@ All Gameball interaction goes through a single service: `backend/src/gameball/ga
 
 ### Assumptions I made
 
-##### 1. Using POST /orders instead of POST /payments for order tracking
+#### 1. Using POST /orders instead of POST /payments for order tracking
 I used /orders because this is an ecommerce app rather than a payment platform.
 
 #### 2. OTP is disabled
