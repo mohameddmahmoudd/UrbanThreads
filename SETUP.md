@@ -43,7 +43,10 @@ Then run:
 ```
 docker compose --env-file .env.docker up --build
 ```
-
+Watch the terminal output. Once you see this line, the app is fully up:
+```
+Backend running on http://localhost:4000
+```
 **4. Start the Stripe webhook listener**
 
 > First time only: run `stripe login` and authenticate using the Stripe credentials in the Additional Notes section below.
@@ -55,12 +58,6 @@ stripe listen --forward-to localhost:4000/payments/webhook
 
 Keep this terminal open while using the app — it is required for payments to complete successfully.
 
-**5. Wait for the app to be ready**
-
-Watch the terminal output. Once you see this line, the app is fully up:
-```
-Backend running on http://localhost:4000
-```
 
 **6. Open the app in your browser**
 
