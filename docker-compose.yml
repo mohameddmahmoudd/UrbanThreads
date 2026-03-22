@@ -39,6 +39,8 @@ services:
     ports:
       - "3000:3000"
     env_file: .env.docker
+    environment:
+      PORT: 3000
     depends_on:
       - backend
 

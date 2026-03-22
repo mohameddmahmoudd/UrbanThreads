@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { cookies } from 'next/headers';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE =
+  process.env.INTERNAL_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:4000/api';
 
 const STATUS_VARIANT: Record<string, 'default' | 'success' | 'warning' | 'error'> = {
   PENDING_PAYMENT: 'warning',

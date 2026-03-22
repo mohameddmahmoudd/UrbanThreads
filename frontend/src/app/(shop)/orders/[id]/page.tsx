@@ -4,7 +4,10 @@ import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE =
+  process.env.INTERNAL_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:4000/api';
 
 interface Props {
   params: Promise<{ id: string }>;

@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const PUBLIC_API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const SERVER_API_BASE = process.env.INTERNAL_API_URL || PUBLIC_API_BASE;
+const API_BASE = typeof window === 'undefined' ? SERVER_API_BASE : PUBLIC_API_BASE;
 
 type RequestOptions = RequestInit & { skipRefresh?: boolean };
 
