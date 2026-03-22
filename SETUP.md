@@ -5,7 +5,7 @@ This guide walks you through running the project locally. No programming experie
 ## Requirements
 
 **Docker** (Desktop preferred)
-Download it from [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+>  Download it from [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
 
 ## Step-by-Step Setup
 
@@ -13,7 +13,7 @@ Download it from [https://www.docker.com/products/docker-desktop](https://www.do
 Clone (or download) this GitHub repository into your IDE or a folder on your machine.
 
 **2. Add the environment file**
-Locate the `.env.docker` file included in the bundled deliverables sent to you by email. Place this file in the **root folder of the project** (the same level as this README).
+Find the `.env.docker` file included in the bundled deliverables sent to you by email. Place this file in the **root folder of the project** (the same level as this README).
 > This file contains the configuration secrets needed to run the app. Do not rename it.
 
 **3. Start the application**
@@ -38,7 +38,7 @@ Navigate to: [http://localhost:3000](http://localhost:3000)
 
 ## Login Credentials
 
-Use the following pre-loaded admin account to log in:
+Use the bootstrapped admin account to log in:
 
 | Field    | Value           |
 |----------|-----------------|
