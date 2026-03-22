@@ -40,25 +40,19 @@ All Gameball interaction goes through a single service: `backend/src/gameball/ga
 
 ### Assumptions I made
 
-#### 1. Using POST /orders instead of POST /payments for order tracking
-I used /orders because this is an ecommerce app rather than a payment platform.
-
-#### 2. OTP is disabled
+#### 1. OTP is disabled
 I hardcode ignoreOtp: true on every hold and redeem call and never collect an OTP from the user.
 
-#### 3. Hold expiry is long enough for checkout
+#### 2. Hold expiry is long enough for checkout
 Gameball point holds have a default 10 min expiry (configurable in dashboard). My cart stores the holdReference with no expiry tracking or refresh logic
 
-#### 4. Fire and forget is acceptable for point redemption
+#### 3. Fire and forget is acceptable for point redemption
 There is no retry queue.
 
-#### 5. No refund/reversal handling, coupon and cashback mentioned in the requirements (I have push notification in widget integration)
+#### 4. No refund/reversal handling, coupon and cashback mentioned in the requirements (I have push notification in widget integration)
 
-#### 6. Widget token generation via JWS+JWE for session token (not /hash endpoint)
+#### 5. Widget token generation via JWS+JWE for session token (not /hash endpoint)
 I generate widget authentication tokens on the backend: sign a JWT, then encrypt with JWE using the Gameball secret key
-
-#### 7. Single currency (USD)
-All Stripe charges are in USD
 
 ---
 
