@@ -19,12 +19,24 @@ Find the `.env.docker` file included in the bundled deliverables sent to you by 
 > This file contains the configuration secrets needed to run the app. Do not rename it.
 
 **3. Start the application**
+
+**Option A — Launcher script (recommended)**
+- **Windows:** Double-click `start.bat` in the project folder
+- **Mac:** Right-click `start.sh` → **Open With** → **Terminal**
+
+The script will build and start everything automatically, then open the app in your browser when ready.
+
+> Mac only: if you get a permission error, open Terminal in the project folder and run `chmod +x start.sh` once, then try again.
+
+---
+
+**Option B — Manual (terminal)**
+
 Open a terminal in the project root folder:
 - **Windows:** Open the project folder in File Explorer, click the address bar, type `cmd`, and press Enter
-- **Mac:** Right click the project folder in Finder and select **"New Terminal at Folder"**
+- **Mac:** Right-click the project folder in Finder and select **"New Terminal at Folder"**
 
 Then run:
-
 ```
 docker compose --env-file .env.docker up --build
 ```
