@@ -11,4 +11,5 @@ out
 coverage
 .DS_Store
 uploads/
-.claude/CLAUDE.md
+.claude/
+.cursor/
