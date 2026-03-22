@@ -59,7 +59,7 @@ stripe listen --forward-to localhost:4000/payments/webhook
 Keep this terminal open while using the app — it is required for payments to complete successfully.
 
 
-**6. Open the app in your browser**
+**5. Open the app in your browser**
 
 Navigate to: [http://localhost:3000](http://localhost:3000)
 
