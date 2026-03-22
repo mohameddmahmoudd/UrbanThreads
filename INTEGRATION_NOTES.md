@@ -4,20 +4,23 @@
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js /TS|
-| Backend | NestJS /TS |
-| Database | **PostgreSQL + Prisma ORM** |
-| Payments | **Stripe Integration** |
-| Auth | **JWT in httpOnly cookies** |
-| Deployment | Docker Compose (DB+BE+FE) |
-| Attachments | Cloudinary (when dockerized) / local filesystem (dev for me) |
+| Frontend | Next.js / TS |
+| Backend | NestJS / TS |
+| Database | PostgreSQL + Prisma ORM |
+| Payments | Stripe |
+| Auth | JWT in httpOnly cookies |
+| Deployment | Docker Compose (DB + BE + FE) |
+| Attachments | Cloudinary (dockerized) / local filesystem (dev) |
+
+---
 
 ## Gameball Integration
 
 All Gameball interaction goes through a single service: `backend/src/gameball/gameball.service.ts`
 
-- Base URL: `https://api.gameball.co/api/v4.0/integrations`
-- Auth headers: `apikey (GAMEBALL_API_KEY) + secretkey (GAMEBALL_SECRET_KEY) (I am turning maximum security option off)`
+- **Base URL:** `https://api.gameball.co/api/v4.0/integrations`
+- **Auth headers:** `apikey (GAMEBALL_API_KEY)` + `secretkey (GAMEBALL_SECRET_KEY`
+ (I am turning maximum security option off)
 
 ### Gameball API Endpoints Used
 
@@ -40,41 +43,38 @@ All Gameball interaction goes through a single service: `backend/src/gameball/ga
 ##### 1. Using POST /orders instead of POST /payments for order tracking
 I used /orders because this is an ecommerce app rather than a payment platform.
 
-##### 2. OTP is disabled
+#### 2. OTP is disabled
 I hardcode ignoreOtp: true on every hold and redeem call and never collect an OTP from the user.
 
-##### 3. Hold expiry is long enough for checkout
+#### 3. Hold expiry is long enough for checkout
 Gameball point holds have a default 10 min expiry (configurable in dashboard). My cart stores the holdReference with no expiry tracking or refresh logic
 
-##### 4. Fire and forget is acceptable for point redemption
+#### 4. Fire and forget is acceptable for point redemption
 There is no retry queue.
 
-##### 5. No refund/reversal handling, coupon and cash back mentioned in the requirements (I have push notification in widget integration)
+#### 5. No refund/reversal handling, coupon and cashback mentioned in the requirements (I have push notification in widget integration)
 
-##### 6. Widget token generation via JWS+JWE for session token (not /hash endpoint)
+#### 6. Widget token generation via JWS+JWE for session token (not /hash endpoint)
 I generate widget authentication tokens on the backend: sign a JWT, then encrypt with JWE using the Gameball secret key
 
-##### 7. Single currency (USD)
+#### 7. Single currency (USD)
 All Stripe charges are in USD
 
-##### 8. Admin access via static 4-digit PIN
-Admin registration is guarded by a single ADMIN_PIN env var shared across all admins
+---
 
-##### 9. Order status transitions are not validated
-Admin can set any status on any order, No state machine enforcing specific transitions
+## What I Would Do Differently in a Production Integration
 
-### What I Would Do Differently in a Production Integration ?
 
-##### Replace fire and forget with a message queue
+#### Replace fire and forget with a message queue
 Stripe may charge the user a reduced amount (discount applied), but redeemPoints() may silently fail. In prod, I would persist call to gameball by pushing to a job queue,same applies to trackOrder().
 
-##### Concurrent Requests Handling
+#### Handle the hold expiry tracking problem mentioned in the assumptions
 
-##### Add automated tests
+#### Concurrent requests handling
+If two concurrent `holdPoints` requests hit the same cart, both could try to release the old hold and create a new one simultaneously. In prod, I would add a database level lock (transactional) on the cart row.
 
-##### Add email verification
-
-##### Replace static admin PIN
+#### Add automated tests
+Mock Gameball API responses to verify edge cases like expired holds or insufficient balance.
 
 #### Stock reservation with decrement
 In prod I would reserve stock when creating the PaymentIntent to prevent overselling.
