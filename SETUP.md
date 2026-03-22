@@ -4,10 +4,12 @@ This guide walks you through running the project locally. No programming experie
 
 ## Requirements
 
-**Docker** (Desktop preferred)
->  Download it from [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+**Docker Desktop** — available for both Windows and Mac
+> Download it from [https://www.docker.com/products/docker-desktop]
 
-## Step-by-Step Setup
+> **Windows users:** During installation, Docker may ask you to enable **WSL2** (Windows Subsystem for Linux). Follow the on screen prompts to do so, it is required for Docker to work on Windows.
+
+## Step by Step Setup
 
 **1. Get the project files**
 Clone (or download) this GitHub repository into your IDE or a folder on your machine.
@@ -17,7 +19,11 @@ Find the `.env.docker` file included in the bundled deliverables sent to you by 
 > This file contains the configuration secrets needed to run the app. Do not rename it.
 
 **3. Start the application**
-Open a terminal in the project root folder and run:
+Open a terminal in the project root folder:
+- **Windows:** Open the project folder in File Explorer, click the address bar, type `cmd`, and press Enter
+- **Mac:** Right click the project folder in Finder and select **"New Terminal at Folder"**
+
+Then run:
 
 ```
 docker compose --env-file .env.docker up --build
