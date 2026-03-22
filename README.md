@@ -1,11 +1,11 @@
 # UrbanThreads
 
-A full-stack ecommerce platform with integrated loyalty rewards, built with Next.js, NestJS, and PostgreSQL.
+An ecommerce platform with integrated loyalty rewards, built with Next.js, NestJS, and PostgreSQL.
 
 ## Features
 
-- Product browsing, cart, and checkout
-- Stripe-powered payments
+- Product browsing, cart, and full checkout flow
+- Stripe Integration for payments
 - Gameball loyalty program (points, tiers, and rewards)
 - Admin dashboard for managing products and orders
 
@@ -19,8 +19,8 @@ See [SETUP.md](SETUP.md) for full setup instructions.
 
 | Layer    | Technology          |
 |----------|---------------------|
-| Frontend | Next.js 15, Tailwind CSS |
-| Backend  | NestJS, Prisma ORM  |
-| Database | PostgreSQL 16       |
+| Frontend | Nextjs, Tailwind CSS |
+| Backend  | Nestjs, Prisma ORM  |
+| Database | PostgreSQL      |
 | Payments | Stripe              |
 | Loyalty  | Gameball            |
